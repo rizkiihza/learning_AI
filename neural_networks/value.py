@@ -1,4 +1,4 @@
-import math
+import numpy as np
 
 class Value:
     def __init__(self, data, label, _parent=(), _op=""):
@@ -14,7 +14,7 @@ class Value:
     
     def __add__(self, other):
         other = other if isinstance(other, Value) else Value(other, str(other))
-        out = Value(self.data + other.data, "{l1}+{l2}".format(l1=self.label, l2=other.label), (self, other), "+")
+        out = Value(self.data + other.data, "".format(l1=self.label, l2=other.label), (self, other), "+")
         def backward():
             self.grad += out.grad
             other.grad += out.grad
@@ -34,11 +34,12 @@ class Value:
     
     def __pow__(self, other):
         assert isinstance(other, (int, float)), "only support float or int"
-        out = Value(self.data ** other, "{l1}**{l2}".format(l1=self.label, l2=other), (self,), "**")
+        out = Value(self.data ** other, "".format(l1=self.label, l2=other), (self,), "**")
 
         def backward():
-            other.grad = other * (self.data ** (other - 1)) * out.grad
-        
+            self.grad = other * (self.data ** (other - 1)) * out.grad
+        out._backward = backward
+
         return out
         
     def __truediv__(self, other):
@@ -46,7 +47,7 @@ class Value:
     
     def __mul__(self, other):
         other = other if isinstance(other, Value) else Value(other, str(other))
-        out = Value(self.data * other.data, "{l1}{l2}".format(l1=self.label,l2=other.label), (self, other), "*")
+        out = Value(self.data * other.data, "".format(l1=self.label,l2=other.label), (self, other), "*")
         def backward():
             self.grad += other.data * out.grad
             other.grad += self.data * out.grad
@@ -58,8 +59,8 @@ class Value:
         return self * other
     
     def tanh(self):
-        tanh_data = (math.exp(2 * self.data) - 1) / (math.exp(2 * self.data) + 1)
-        out = Value(tanh_data, "tanh({l1})".format(l1=self.label), (self,), "tanh")
+        tanh_data = float(np.tanh(self.data))
+        out = Value(tanh_data, "".format(l1=self.label), (self,), "tanh")
         def backward():
             self.grad += (1 - tanh_data * tanh_data) * out.grad
         out._backward = backward

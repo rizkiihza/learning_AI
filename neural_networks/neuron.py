@@ -1,6 +1,5 @@
 import value
 import random
-import visualizer
 
 class Neuron:
     def __init__(self, nin: int):
@@ -12,11 +11,6 @@ class Neuron:
         out = act.tanh() 
 
         return out
-
-        
-n = Neuron(3)
-out = n([value.Value(0.2, "x0"), value.Value(-0.7, "x1"), value.Value(0, "x2")])
-out.backpropagate()
-
-visualizer.draw_directed(out)
-
+    
+    def parameters(self) -> list[value.Value]:
+        return self.w + [self.b]

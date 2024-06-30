@@ -8,3 +8,6 @@ class Layer:
     def __call__(self, x: list[value.Value]) -> list[value.Value]:
         outs = [neuron(x) for neuron in self.neurons]
         return outs
+    
+    def parameters(self) -> list[value.Value]:
+        return [p for n in self.neurons for p in n.parameters()]
