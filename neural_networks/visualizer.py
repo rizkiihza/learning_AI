@@ -2,9 +2,9 @@ import value
 
 from graphviz import Digraph
 
-def trace(root):
+def trace(root: value.Value) -> tuple[set, set]:
     nodes, edges = set(), set()
-    def build(v):
+    def build(v: value.Value):
         if v not in nodes:
             nodes.add(v)
             for parent in v._parent:
@@ -14,7 +14,7 @@ def trace(root):
     build(root)
     return nodes, edges
 
-def draw_directed(root):
+def draw_directed(root: value.Value):
     dot = Digraph(format='svg', graph_attr={'rankdir': 'LR'}) # left to right
     
     nodes, edges = trace(root)

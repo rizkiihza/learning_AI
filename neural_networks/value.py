@@ -13,8 +13,8 @@ class Value:
         return "Value=(data={data}, grad={grad})".format(data=self.data, grad=self.grad)
     
     def __add__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data + other.data, "{l1}+{l2}".format(l1=self.label, l2=self.label), (self, other), "+")
+        other = other if isinstance(other, Value) else Value(other, str(other))
+        out = Value(self.data + other.data, "{l1}+{l2}".format(l1=self.label, l2=other.label), (self, other), "+")
         def backward():
             self.grad += out.grad
             other.grad += out.grad
@@ -45,8 +45,8 @@ class Value:
         return self * (other ** -1)
     
     def __mul__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data * other.data, "{l1}{l2}".format(l1=self.label,l2=self.label), (self, other), "*")
+        other = other if isinstance(other, Value) else Value(other, str(other))
+        out = Value(self.data * other.data, "{l1}{l2}".format(l1=self.label,l2=other.label), (self, other), "*")
         def backward():
             self.grad += other.data * out.grad
             other.grad += self.data * out.grad
@@ -59,7 +59,7 @@ class Value:
     
     def tanh(self):
         tanh_data = (math.exp(2 * self.data) - 1) / (math.exp(2 * self.data) + 1)
-        out = Value(tanh_data, "tanh-{l1}".format(l1=self.label), (self,), "tanh")
+        out = Value(tanh_data, "tanh({l1})".format(l1=self.label), (self,), "tanh")
         def backward():
             self.grad += (1 - tanh_data * tanh_data) * out.grad
         out._backward = backward
@@ -75,4 +75,3 @@ class Value:
 
             for p in front._parent:
                 nodes.append(p)
-
